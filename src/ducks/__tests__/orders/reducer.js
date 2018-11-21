@@ -1,8 +1,8 @@
 import { reducer, actions } from '../../orders';
 import { VANILLA } from '../../../constants/flavors';
 
-describe('Orders reduce', function() {
-    it('should store the order in the state', function() {
+describe('Orders reduce', function () {
+    it('should store the order in the state', function () {
         const newState = reducer(undefined, actions.placeOrder({
             customerName: 'Cindy',
             cone: false,
@@ -19,5 +19,41 @@ describe('Orders reduce', function() {
         });
         expect(typeof newState[0].createdAt).toEqual('number');
         expect(newState[0].status).toEqual('pending');
+    });
+
+    it('should mark a given order as fulfilled in the store', function () {
+        const existingState = [
+            {
+                customerName: 'Cindy',
+                status: 'pending'
+            }
+        ];
+
+        const newState = reducer(existingState, actions.fulfillOrder({ id: 0 }));
+        expect(newState[0].status).toEqual('fulfilled')
+    });
+
+    it('should mark a given order as paid in the store', function () {
+        const existingState = [
+            {
+                customerName: 'Cindy',
+                status: 'pending'
+            }
+        ];
+
+        const newState = reducer(existingState, actions.payForOrder({ id: 0 }));
+        expect(newState[0].status).toEqual('paid')
+    });
+
+    it('should remove a given order from the store', function () {
+        const existingState = [
+            {
+                customerName: 'Cindy',
+                status: 'pending',
+            }
+        ];
+
+        const newState = reducer(existingState, actions.cancelOrder({ id: 0 }));
+        expect(newState).toEqual([]);
     });
 });

@@ -1,4 +1,5 @@
 import { actions, types } from '../../orders';
+import { VANILLA } from '../../../constants/flavors';
 
 describe('placeOrder()', function () {
     it('should have the right action type', function () {
@@ -39,7 +40,7 @@ describe('placeOrder()', function () {
         expect(action.payload.cone).toEqual(false);
     });
 
-    it('should default to a cone if no cone option is given', function() {
+    it('should default to a cone if no cone option is given', function () {
         const action = actions.placeOrder({});
         expect(action.payload.cone).toEqual(true);
     });
@@ -47,9 +48,48 @@ describe('placeOrder()', function () {
     it('should contain the scoops object in the payload', function () {
         const action = actions.placeOrder({
             scoops: {
-                'vanilla': 1
+                [VANILLA]: 1
             }
         });
+
+        expect(action.payload.scoops).toEqual({
+            [VANILLA]: 1,
+        });
+    });
+});
+
+describe('fulfillOrder()', function () {
+    it('should have the right action type', function () {
+        const action = actions.fulfillOrder({ id: 5 });
+        expect(action.type).toEqual(types.FULFILL_ORDER);
     });
 
+    it('should have the ID in the payload', function () {
+        const action = actions.fulfillOrder({ id: 5 });
+        expect(action.payload).toEqual(5);
+    });
+});
+
+describe('payForOrder()', function () {
+    it('should have the right action type', function () {
+        const action = actions.payForOrder({ id: 5 });
+        expect(action.type).toEqual(types.PAY_FOR_ORDER);
+    });
+
+    it('should have the ID in the payload', function () {
+        const action = actions.payForOrder({ id: 5 });
+        expect(action.payload).toEqual(5);
+    });
+});
+
+describe('cancelOrder()', function () {
+    it('should have the right action type', function () {
+        const action = actions.cancelOrder({ id: 5 });
+        expect(action.type).toEqual(types.CANCEL_ORDER);
+    });
+
+    it('should have the ID in the payload', function () {
+        const action = actions.cancelOrder({ id: 5 });
+        expect(action.payload).toEqual(5);
+    });
 });
