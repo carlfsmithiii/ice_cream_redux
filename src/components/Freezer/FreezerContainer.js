@@ -1,33 +1,17 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 
 import { actions } from "../../ducks/freezer";
-import store from "../../store";
 import * as FLAVORS from "../../constants/flavors";
 
-import Freezer from './Freezer';
+import Freezer from "./Freezer";
 
 class FreezerContainer extends Component {
-  state = {
-    flavors: store.getState().freezer.flavors,
-    temperature: store.getState().freezer.temperature
-  };
-
   componentDidMount() {
-    this.unsubscribe = store.subscribe(() => {
-      this.setState({
-        flavors: store.getState().freezer.flavors,
-        temperature: store.getState().freezer.temperature
-      });
-    });
-
     setInterval(() => {
-      const randomTemperature = -Math.floor(Math.random() * 10);
-      store.dispatch(actions.updateTemperature(randomTemperature));
+      const randomTemperature = -Math.round(Math.random() * 10);
+      this.props.updateTemperature(randomTemperature);
     }, 2000);
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe();
   }
 
   handleClickRestock = flavorName => {
@@ -36,7 +20,7 @@ class FreezerContainer extends Component {
     );
 
     if (!isNaN(amount)) {
-      store.dispatch(actions.addProductToFreezer(flavorName, amount));
+      this.props.addProductToFreezer(flavorName, amount);
     }
   };
 
@@ -54,20 +38,36 @@ class FreezerContainer extends Component {
   };
 
   handleClickFlavor = flavorName => {
-    store.dispatch(actions.removeScoop(flavorName));
+    this.props.removeScoop(flavorName);
   };
 
   render() {
     return (
-      <Freezer 
-        flavors={this.state.flavors}
-        temperature={this.state.temperature}
+      <Freezer
+        flavors={this.props.flavors}
+        temperature={this.props.temperature}
         onClickRestock={this.handleClickRestock}
-        onClickFlavor={this.handleClickFlavor} 
+        onClickFlavor={this.handleClickFlavor}
         onClickAddProduct={this.handleClickAddProduct}
       />
     );
   }
 }
 
-export default FreezerContainer;
+const mapStateToProps = state => ({
+  flavors: state.freezer.flavors,
+  temperature: state.freezer.temperature
+});
+
+const mapDispatchToProps = dispatch => ({
+  updateTemperature: temperature =>
+    dispatch(actions.updateTemperature(temperature)),
+  addProductToFreezer: (flavorName, amount) =>
+    dispatch(actions.addProductToFreezer(flavorName, amount)),
+  removeScoop: flavorName => dispatch(actions.removeScoop(flavorName))
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(FreezerContainer);
